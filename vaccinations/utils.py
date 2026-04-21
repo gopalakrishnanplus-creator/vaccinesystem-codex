@@ -220,15 +220,15 @@ def choose_two_languages_for_state(state: str) -> tuple[str, str]:
 
 def build_whatsapp_url(e164_number: str, message: str, request=None) -> str:
     """
-    Build a WhatsApp Web deep link. This opens web.whatsapp.com with a prefilled message.
+    Build a WhatsApp API deep link with a prefilled message.
     """
     to_e164 = normalize_msisdn(e164_number or "")
     to = to_e164.replace("+", "")
     import urllib.parse
-    return f"https://web.whatsapp.com/send?phone={to}&text={urllib.parse.quote(message)}"
+    return f"https://api.whatsapp.com/send?phone={to}&text={urllib.parse.quote(message)}"
 
 def build_whatsapp_web_url(e164_number: str, message: str) -> str:
-    # Alternative: Direct WhatsApp Web URL (requires user to be logged in)
+    # Direct WhatsApp Web URL (requires user to be logged in)
     to = (e164_number or "").replace("+", "")
     import urllib.parse
     return f"https://web.whatsapp.com/send?phone={to}&text={urllib.parse.quote(message)}"

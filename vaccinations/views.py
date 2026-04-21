@@ -1401,19 +1401,8 @@ class DoctorPortalAddRecordView(View):
             msg_secondary = build_patient_message(secondary, self.doctor.full_name, link)
             message = f"{msg_primary}\n\n——————————\n\n{msg_secondary}"
 
-            import re, urllib.parse
             parent_whatsapp = parent.whatsapp_e164
-            phone_number = re.sub(r"[^\d+]", "", parent_whatsapp)
-            if not phone_number.startswith("+"):
-                if phone_number.startswith("91"):
-                    phone_number = "+" + phone_number
-                elif phone_number.startswith("0"):
-                    phone_number = "+91" + phone_number[1:]
-                else:
-                    phone_number = "+91" + phone_number
-            clean_number = phone_number.replace("+", "")
-            encoded_message = urllib.parse.quote(message)
-            whatsapp_url = f"https://web.whatsapp.com/send?phone={clean_number}&text={encoded_message}"
+            whatsapp_url = build_whatsapp_url(parent_whatsapp, message, request)
             return redirect(whatsapp_url)
 
         # Default redirect if WhatsApp not sent
