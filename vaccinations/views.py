@@ -2046,7 +2046,7 @@ class PatientEducationView(View):
     Shows Patient Education videos for a vaccine in all available languages.
     Used by reminder messages to provide comprehensive education content.
     """
-    template_name = "vaccinations/parent_education_simple.html"
+    template_name = "vaccinations/patient_education_simple.html"
 
     def get(self, request, vaccine_id: int):
         vaccine_mapping = {
