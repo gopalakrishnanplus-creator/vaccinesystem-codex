@@ -65,7 +65,7 @@ PATIENTS_DB_PORT = os.getenv("PATIENTS_DB_PORT", "3306")
 SECRET_KEY = 'django-insecure-7r1gry17%^l63tjrxwl&8&@7ccl#vagkax(-k)y=z-(#e(pv-@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "newvaccine.cpdinclinic.co.in",]  # dev
 CSRF_TRUSTED_ORIGINS = [
