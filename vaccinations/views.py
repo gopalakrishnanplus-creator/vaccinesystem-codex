@@ -1303,12 +1303,13 @@ class DoctorPortalAddRecordView(View):
                     raise
             parents_qs = Parent.objects.using("patients").filter(pk=parent.pk)
 
-        # Child creation
-        child, created = Child.objects.get_or_create(
+        # Match the public add flow and write against the patients DB explicitly.
+        # The live MySQL schema still requires the legacy columns such as `full_name`.
+        child, created = Child.objects.using("patients").get_or_create(
             parent=parent,
             full_name=form.cleaned_data["child_name"],
+            date_of_birth=form.cleaned_data["date_of_birth"],
             defaults={
-                "date_of_birth": form.cleaned_data["date_of_birth"],
                 "clinic": self.doctor.clinic,
                 "sex": form.cleaned_data["gender"],
                 "state": form.cleaned_data["state"] or self.doctor.clinic.state,
