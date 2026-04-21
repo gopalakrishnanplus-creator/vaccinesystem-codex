@@ -1,65 +1,71 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Send Reminders — {{ child.full_name }}{% endblock %}
 {% block content %}
-<h2>Send Reminders</h2>
-<p class="muted"><strong>Child:</strong> {{ child.full_name }} • DOB {{ child.date_of_birth }}</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Send reminders</h1>
+  <p class="page-subtitle"><strong>Child:</strong> {{ child.full_name }} • DOB {{ child.date_of_birth }}</p>
+</div>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Vaccine</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for r in rows %}
-    <tr>
-      <td>
-        <a href="{% url 'vaccinations:doc-vaccine-edu' doctor.portal_token r.vaccine.id %}" target="_blank">
-          {{ r.cd.dose.dose_label }}
-        </a>
-      </td>
-      <td>
-        {% if r.status == 'given' %}
-        Given
-        {% elif r.status == 'due' %}
-        Due ({{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'upcoming_24h' %}
-        Upcoming ({{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'overdue_today' %}
-        Overdue Today (due {{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'future' %}
-        Future ({{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'overdue_old' %}
-        Overdue (older than retention)
-        {% elif r.status == 'unscheduled' %}
-        Waiting for previous dose
-        {% endif %}
-      </td>
-      <td>
-        {% if r.sent_at %}
-        <span class="btn btn-success" style="cursor:default">
-          Reminder Sent — {{ r.sent_at|date:"d M, h:i a" }}
-        </span>
-        {% elif r.eligible %}
-        <a class="btn" href="{% url 'vaccinations:doc-send-reminder' doctor.portal_token r.cd.id %}">
-          Send Reminder
-        </a>
-        {% else %}
-        <span class="muted">Not eligible</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="3" class="muted">No doses eligible for reminders right now.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-shell">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Vaccine</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>
+          <a href="{% url 'vaccinations:doc-vaccine-edu' doctor.portal_token r.vaccine.id %}" target="_blank">
+            {{ r.cd.dose.dose_label }}
+          </a>
+        </td>
+        <td>
+          {% if r.status == 'given' %}
+          Given
+          {% elif r.status == 'due' %}
+          Due ({{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'upcoming_24h' %}
+          Upcoming ({{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'overdue_today' %}
+          Overdue Today (due {{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'future' %}
+          Future ({{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'overdue_old' %}
+          Overdue (older than retention)
+          {% elif r.status == 'unscheduled' %}
+          Waiting for previous dose
+          {% endif %}
+        </td>
+        <td>
+          {% if r.sent_at %}
+          <div class="stack-sm">
+            <span class="status">Sent</span>
+            <span class="muted">{{ r.sent_at|date:"d M, h:i a" }}</span>
+          </div>
+          {% elif r.eligible %}
+          <a class="btn" href="{% url 'vaccinations:doc-send-reminder' doctor.portal_token r.cd.id %}">
+            Send Reminder
+          </a>
+          {% else %}
+          <span class="muted">Not eligible</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3" class="muted">No doses eligible for reminders right now.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
-<p style="margin-top:12px">
-  <a class="btn" href="{% url 'vaccinations:doc-update' doctor.portal_token %}">← Back to search</a>
-</p>
+<div class="button-row back-row">
+  <a class="btn btn-secondary" href="{% url 'vaccinations:doc-update' doctor.portal_token %}">Back to Search</a>
+</div>
 {% endblock %}

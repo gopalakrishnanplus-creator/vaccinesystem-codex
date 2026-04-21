@@ -2,42 +2,45 @@
 {% load media %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h2 style="margin-bottom:6px">{{ vaccine.name }}</h2>
-<p class="muted">{{ lead }}</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Vaccine education</span>
+  <h1>{{ vaccine.name }}</h1>
+  <p class="page-subtitle">{{ lead }}</p>
+</div>
 
 {% if videos %}
-<div style="display:flex; flex-direction:column; gap:24px">
+<div class="video-stack">
   {% for v in videos %}
-  <div style="border:1px solid #eee; border-radius:10px; padding:12px">
-    <div style="font-weight:600">{{ v.title|default:v.language|upper }}</div>
+  <div class="video-card">
+    <div class="video-card__title">{{ v.title|default:v.language|upper }}</div>
 
     {% youtube_embed v.video_url as embed_src %}
     {% if embed_src %}
-      <div id="container-{{ forloop.counter }}" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-top:8px">
+      <div id="container-{{ forloop.counter }}" class="video-embed">
         <iframe id="vid-{{ forloop.counter }}"
                 data-src="{{ embed_src }}"
                 data-original-url="{{ v.video_url }}"
-                style="position:absolute; top:0; left:0; width:100%; height:100%; border:0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen></iframe>
-        <div id="load-{{ forloop.counter }}" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-          <div style="border:4px solid #f3f3f3; border-top:4px solid #1976d2; border-radius:50%; width:40px; height:40px; animation:spin 2s linear infinite;"></div>
+        <div id="load-{{ forloop.counter }}" class="video-loader">
+          <div class="video-loader__inner">
+            <div class="video-spinner"></div>
+            <p>Loading video...</p>
+          </div>
         </div>
       </div>
-      <!-- Error fallback (hidden by default) -->
-      <div id="error-{{ forloop.counter }}" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:8px;">
-        <p style="margin:0 0 10px 0; color:#856404;">
-          <strong>⚠️ Video cannot be embedded</strong><br>
+      <div id="error-{{ forloop.counter }}" class="video-fallback" style="display:none;">
+        <p>
+          <strong>Video cannot be embedded</strong><br>
           <small>This video has embedding restrictions set by the uploader.</small>
         </p>
-        <a href="{{ v.video_url }}" target="_blank" rel="noopener"
-           style="background:#1976d2; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; display:inline-block; font-weight:600;">
-          🎥 Watch on YouTube →
-        </a>
+        <div class="video-fallback__actions">
+          <a class="btn" href="{{ v.video_url }}" target="_blank" rel="noopener">Watch on YouTube</a>
+        </div>
       </div>
     {% else %}
-      <div style="background:#ffebee; padding:15px; border-radius:8px; margin-top:8px;">
-        <p style="margin:0 0 10px 0; color:#c62828;">
+      <div class="video-fallback video-fallback--error">
+        <p>
           <strong>Invalid video URL</strong>
         </p>
         <a class="btn" href="{{ v.video_url }}" target="_blank" rel="noopener">Open on YouTube</a>
@@ -45,27 +48,18 @@
     {% endif %}
 
     {% if child and child.clinic %}
-    <div class="edu-actions" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; padding-top:12px; border-top:1px solid #eee;">
+    <div class="edu-actions">
       {% if child.clinic.whatsapp_e164 or child.clinic.phone %}
         {% with phone=child.clinic.whatsapp_e164|default:child.clinic.phone %}
-        <a class="btn btn-primary"
-           href="https://wa.me/{{ phone|cut:'+' }}?text=Hi%2C%20I%27d%20like%20to%20book%20an%20appointment%20for%20my%20child%27s%20vaccination.%0A%0AVaccine%3A%20{{ v.vaccine.name|urlencode }}%0AChild%27s%20Name%3A%20{{ child.get_child_name|urlencode }}%0APreferred%20Date%20%26%20Time%3A%20%5BPlease%20specify%5D%0A%0APlease%20confirm%20availability.%20Thank%20you%21"
-           target="_blank" rel="noopener"
-           style="background:#25D366; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:600; border:none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
+        <a class="btn btn-success"
+           href="https://api.whatsapp.com/send?phone={{ phone|cut:'+' }}&text=Hi%2C%20I%27d%20like%20to%20book%20an%20appointment%20for%20my%20child%27s%20vaccination.%0A%0AVaccine%3A%20{{ v.vaccine.name|urlencode }}%0AChild%27s%20Name%3A%20{{ child.get_child_name|urlencode }}%0APreferred%20Date%20%26%20Time%3A%20%5BPlease%20specify%5D%0A%0APlease%20confirm%20availability.%20Thank%20you%21"
+           target="_blank" rel="noopener">
           Book an Appointment
         </a>
         {% endwith %}
       {% endif %}
       {% if child.clinic.phone %}
-        <a class="btn btn-outline"
-           href="tel:{{ child.clinic.phone }}"
-           style="background:white; color:#1976d2; padding:12px 20px; border:2px solid #1976d2; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:600;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-          </svg>
+        <a class="btn btn-secondary" href="tel:{{ child.clinic.phone }}">
           Call the Clinic
         </a>
       {% endif %}
@@ -75,7 +69,7 @@
   {% endfor %}
 </div>
 {% else %}
-<p class="muted">No videos are available for this vaccine yet.</p>
+<div class="empty-state">No videos are available for this vaccine yet.</div>
 {% endif %}
 
 <script>
@@ -142,11 +136,5 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-<style>
-@keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-</style>
-<p style="margin-top:16px"><a class="btn" href="javascript:history.back()">← Back</a></p>
+<div class="back-row"><a class="btn btn-secondary" href="javascript:history.back()">Back</a></div>
 {% endblock %}

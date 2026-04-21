@@ -1,18 +1,23 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Select Child{% endblock %}
 {% block content %}
-<h2>Select Child</h2>
+<div class="page-intro">
+  <span class="page-eyebrow">Child selection</span>
+  <h1>Select a child</h1>
+  <p class="page-subtitle">Choose the child whose vaccination card you want to open.</p>
+</div>
+
 <ul class="list">
   {% for c in children %}
   <li>
-    <div><strong>{{ c.full_name }}</strong></div>
-    <div class="muted">DOB: {{ c.date_of_birth }}{% if c.state %} • {{ c.state }}{% endif %}</div>
-    <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="item-title">{{ c.full_name }}</div>
+    <div class="item-meta">DOB {{ c.date_of_birth }}{% if c.state %} • {{ c.state }}{% endif %}</div>
+    <div class="item-actions">
       <a class="btn" href="{% url 'vaccinations:card' c.id %}">Open Vaccination Card</a>
     </div>
   </li>
   {% empty %}
-  <li>No children found for this parent.</li>
+  <li class="empty-state">No children found for this parent.</li>
   {% endfor %}
 </ul>
 {% endblock %}

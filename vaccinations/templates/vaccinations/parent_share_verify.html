@@ -1,29 +1,26 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Verify number{% endblock %}
 {% block content %}
-<h2>Verify your WhatsApp number</h2>
-<p>Please enter your WhatsApp number to access {{ child.full_name }}'s vaccination card.</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Verification</span>
+  <h1>Verify your WhatsApp number</h1>
+  <p class="page-subtitle">Enter your WhatsApp number to access {{ child.full_name }}'s vaccination card securely.</p>
+</div>
 
-{% if messages %}
-<ul>
-  {% for m in messages %}
-  <li style="color:{% if m.tags == 'error' %}crimson{% else %}#555{% endif %}">{{ m }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-<form method="post">
-  {% csrf_token %}
-  <div class="field">
-    <label>Your WhatsApp number</label>
-    {{ form.whatsapp }}
-  </div>
-  <button class="btn" type="submit">Verify &amp; Continue</button>
-</form>
-
-<p style="margin-top:14px"><a href="{% url 'vaccinations:update' %}">Use a different number</a></p>
+<div class="panel form-shell stack-md">
+  <form method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label>Your WhatsApp number</label>
+      {{ form.whatsapp }}
+    </div>
+    <div class="button-row">
+      <button class="btn" type="submit">Verify &amp; Continue</button>
+      <a class="btn btn-secondary" href="{% url 'vaccinations:update' %}">Use a Different Number</a>
+    </div>
+  </form>
+</div>
 {% endblock %}
-
 
 
 

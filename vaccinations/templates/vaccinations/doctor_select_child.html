@@ -1,20 +1,25 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Select Child — Doctor{% endblock %}
 {% block content %}
-<h2>Select Child ({{ doctor.clinic.name }})</h2>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Select a child</h1>
+  <p class="page-subtitle">Results are scoped to {{ doctor.clinic.name }}. Open the card, full schedule, or reminder tools.</p>
+</div>
+
 <ul class="list">
   {% for c in children %}
   <li>
-    <div><strong>{{ c.full_name }}</strong></div>
-    <div class="muted">DOB: {{ c.date_of_birth }}{% if c.state %} • {{ c.state }}{% endif %}</div>
-    <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="item-title">{{ c.full_name }}</div>
+    <div class="item-meta">DOB {{ c.date_of_birth }}{% if c.state %} • {{ c.state }}{% endif %}</div>
+    <div class="item-actions">
       <a class="btn" href="{% url 'vaccinations:doc-card' doctor.portal_token c.id %}">Open Vaccination Card</a>
-      <a class="btn" href="{% url 'vaccinations:doc-card-all' doctor.portal_token c.id %}">Full Schedule</a>
-      <a class="btn" href="{% url 'vaccinations:doc-child-reminders' doctor.portal_token c.id %}">Send Reminders</a>
+      <a class="btn btn-secondary" href="{% url 'vaccinations:doc-card-all' doctor.portal_token c.id %}">Full Schedule</a>
+      <a class="btn btn-soft" href="{% url 'vaccinations:doc-child-reminders' doctor.portal_token c.id %}">Send Reminders</a>
     </div>
   </li>
   {% empty %}
-  <li>No children found for that WhatsApp number in your clinic.</li>
+  <li class="empty-state">No children found for that WhatsApp number in your clinic.</li>
   {% endfor %}
 </ul>
 {% endblock %}

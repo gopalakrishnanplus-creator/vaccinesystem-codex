@@ -1,21 +1,28 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Edit Doctor/Clinic Profile{% endblock %}
 {% block content %}
-<h2>Edit Doctor/Clinic Profile</h2>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <div class="field"><label>Doctor's Name*</label> {{ form.doctor_name }}</div>
-  <div class="field"><label>Doctor's WhatsApp Number*</label> {{ form.doctor_whatsapp }}</div>
-  <div class="field"><label>Clinic WhatsApp Number</label> {{ form.clinic_whatsapp }}</div>
-  <div class="field"><label>Doctor Photo</label> {{ form.doctor_photo }}</div>
-  <div class="field"><label>State*</label> {{ form.state }}</div>
-  <div class="field"><label>Head Quarters</label> {{ form.head_quarters }}</div>
-  <div class="field"><label>Clinic Address</label> {{ form.clinic_address }}</div>
-  <div class="field"><label>Preferred Languages</label> {{ form.preferred_languages }}</div>
-  <div class="field"><label>Pincode</label> {{ form.pincode }}</div>
-  <div class="field"><label>Doctor's Email ID*</label> {{ form.doctor_email }}</div>
-  <div class="field"><label>Receptionist's Email ID</label> {{ form.receptionist_email }}</div>
-  <div class="field"><label>Indian Medical Council Number*</label> {{ form.imc_number }}</div>
-  <button class="btn">Save</button>
-</form>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Edit doctor and clinic profile</h1>
+  <p class="page-subtitle">Update contact details, clinic information, languages, and registration details used across the portal.</p>
+</div>
+
+<div class="panel form-shell">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="field"><label>Doctor's Name*</label> {{ form.doctor_name }}</div>
+    <div class="field"><label>Doctor's WhatsApp Number*</label> {{ form.doctor_whatsapp }}</div>
+    <div class="field"><label>Clinic WhatsApp Number</label> {{ form.clinic_whatsapp }}</div>
+    <div class="field"><label>Doctor Photo</label> {{ form.doctor_photo }}</div>
+    <div class="field"><label>State*</label> {{ form.state }}</div>
+    <div class="field"><label>Head Quarters</label> {{ form.head_quarters }}</div>
+    <div class="field"><label>Clinic Address</label> {{ form.clinic_address }}</div>
+    <div class="field"><label>Preferred Languages</label> {{ form.preferred_languages }}</div>
+    <div class="field"><label>Pincode</label> {{ form.pincode }}</div>
+    <div class="field"><label>Doctor's Email ID*</label> {{ form.doctor_email }}</div>
+    <div class="field"><label>Receptionist's Email ID</label> {{ form.receptionist_email }}</div>
+    <div class="field"><label>Indian Medical Council Number*</label> {{ form.imc_number }}</div>
+    <button class="btn">Save Changes</button>
+  </form>
+</div>
 {% endblock %}

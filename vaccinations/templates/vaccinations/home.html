@@ -1,11 +1,27 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Welcome — Vaccination System{% endblock %}
 {% block content %}
-  <div class="card" style="padding:24px; border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.06); max-width:720px; margin:0 auto;">
-    <h2 style="margin:0 0 12px 0;">Choose an option</h2>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:14px;">
-      <a class="btn btn-block" href="{% url 'vaccinations:doctor-register-self' %}" style="padding:16px 20px; font-weight:700;">Doctor Registration</a>
-      <a class="btn btn-block" href="{% url 'admin:index' %}" style="padding:16px 20px; font-weight:700; background:#6d28d9;">Field Partner (Admin)</a>
-    </div>
+<div class="hero-card card stack-lg">
+  <div class="page-intro">
+    <span class="page-eyebrow">Vaccination workflows</span>
+    <h1>Simple tools for doctors, clinics, and field teams</h1>
+    <p class="page-subtitle">
+      Register doctors, maintain child vaccination cards, and manage reminder workflows from one clear workspace.
+    </p>
   </div>
+
+  <div class="action-grid">
+    <article class="action-card">
+      <h3>Doctor Registration</h3>
+      <p>Create a doctor account and open the clinic portal for patient onboarding, card updates, and reminders.</p>
+      <a class="btn btn-block" href="{% url 'vaccinations:doctor-register-self' %}">Open Doctor Registration</a>
+    </article>
+
+    <article class="action-card">
+      <h3>Field Partner Admin</h3>
+      <p>Use the admin workspace to manage partner onboarding, field reps, content, schedules, and clinic data.</p>
+      <a class="btn btn-secondary btn-block" href="{% url 'admin:index' %}">Open Admin Workspace</a>
+    </article>
+  </div>
+</div>
 {% endblock %}

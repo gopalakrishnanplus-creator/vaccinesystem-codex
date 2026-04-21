@@ -1,17 +1,23 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Admin Access{% endblock %}
 {% block content %}
-<h2>Admin Access</h2>
-<p class="muted">Enter the admin password to open the partner provisioning workspace.</p>
-<form method="post">
-  {% csrf_token %}
-  <div class="field">
-    <label>Password</label>
-    <input type="password" name="password" required>
-  </div>
-  <button class="btn" type="submit">Continue</button>
-</form>
-{% if error %}
-<p class="muted" style="color:#991b1b; margin-top:12px;">{{ error }}</p>
-{% endif %}
+<div class="page-intro">
+  <span class="page-eyebrow">Admin gate</span>
+  <h1>Admin access</h1>
+  <p class="page-subtitle">Enter the admin password to open the partner provisioning workspace.</p>
+</div>
+
+<div class="panel form-shell stack-md">
+  <form method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" required>
+    </div>
+    <button class="btn" type="submit">Continue</button>
+  </form>
+  {% if error %}
+  <p class="text-danger">{{ error }}</p>
+  {% endif %}
+</div>
 {% endblock %}

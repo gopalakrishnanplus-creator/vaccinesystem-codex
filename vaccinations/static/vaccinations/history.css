@@ -1,95 +1,118 @@
-/* Page-scoped color tokens (fallbacks included) */
-:root {
-  --vh-text: #111827;
-  --vh-title: #5b21b6;        /* section titles */
-  --vh-th: #7c3aed;           /* table header text */
-  --vh-link: #2563eb;         /* normal link */
-  --vh-link-hover: #1e40af;   /* hover/focus */
-  --vh-btn-bg: #a78bfa;       /* “Call Clinic” button bg */
-  --vh-btn-text: #ffffff;
-}
-
-/* Scope everything to this page only */
 .vh {
-  color: var(--vh-text);
+  color: var(--text);
 }
 
-/* Anchors: cover all states so UA visited purple never leaks in */
-.vh a,
-.vh a:link,
-.vh a:visited {
-  color: var(--vh-link) !important;
-  text-decoration: none;
+.vh .vh-title {
+  color: var(--text);
 }
 
-.vh a:hover,
-.vh a:focus {
-  color: var(--vh-link-hover) !important;
+.history-hero {
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(15, 118, 110, 0.06)),
+    var(--surface);
+}
+
+.history-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.history-metric {
+  padding: 16px 18px;
+  border: 1px solid rgba(200, 213, 227, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.history-metric__label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.history-metric__value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.history-section-title {
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.history-link,
+.history-link:link,
+.history-link:visited {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.history-link:hover,
+.history-link:focus {
+  color: var(--primary-dark);
   text-decoration: underline;
 }
 
-/* Headings and table headers */
-.vh .vh-title {
-  color: var(--vh-title) !important;
+.history-table thead th {
+  color: var(--text-muted);
 }
 
-.vh table thead th {
-  color: var(--vh-th) !important;
+.btn-call {
+  min-height: 40px;
+  padding: 9px 16px;
 }
 
-/* Buttons (Call Clinic) */
-.vh .btn-call {
-  background: var(--vh-btn-bg) !important;
-  color: var(--vh-btn-text) !important;
-  border: 0;
-}
-
-.vh .btn-call:hover,
-.vh .btn-call:focus {
-  filter: brightness(0.95);
-}
-
-/* Optional: ensure table cells don’t inherit odd link colors */
-.vh table td,
-.vh table th {
-  color: inherit;
-}
-
-/* ---------------------------------------- */
-/* Existing Badge Styles                    */
-/* ---------------------------------------- */
 .vh-badge {
-  display: inline-block;
-  padding: 0.35rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.42rem 0.78rem;
   border-radius: 9999px;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.88rem;
   line-height: 1;
   white-space: nowrap;
 }
 
-/* Status-specific colors */
 .vh-badge--ok {
-  background: #e8f5e9; /* Light green */
-  color: #1b5e20;
+  background: #e8f5e9;
+  color: #166534;
 }
 
 .vh-badge--due {
-  background: #fff8e1; /* Amber */
-  color: #e65100;
+  background: #fff7e8;
+  color: #b45309;
 }
 
 .vh-badge--overdue {
-  background: #ffebee; /* Light red */
-  color: #b71c1c;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .vh-badge--future {
-  background: #e3f2fd; /* Light blue */
-  color: #0d47a1;
+  background: #e8efff;
+  color: #1d4ed8;
 }
 
 .vh-badge--locked {
-  background: #eceff1; /* Light grey */
-  color: #37474f;
+  background: #eef2f7;
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  .history-hero {
+    padding: 18px;
+  }
 }

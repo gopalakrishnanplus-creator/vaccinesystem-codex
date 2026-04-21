@@ -1,14 +1,20 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Update Record{% endblock %}
 {% block content %}
-  <h2>Update Record</h2>
-  <p class="muted">Enter the parent's WhatsApp number to view/update records.</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Find records</span>
+  <h1>Update a vaccination record</h1>
+  <p class="page-subtitle">Enter the parent’s WhatsApp number to open the children linked to that profile.</p>
+</div>
+
+<div class="panel form-shell">
   <form method="post">
     {% csrf_token %}
     <div class="field">
       <label>Parent's WhatsApp No.</label>
       {{ form.parent_whatsapp }}
     </div>
-    <button class="btn">Proceed</button>
+    <button class="btn">Continue</button>
   </form>
+</div>
 {% endblock %}

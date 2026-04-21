@@ -1,41 +1,49 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Add Record{% endblock %}
 {% block content %}
-<h2>Add Record</h2>
-<form method="post">
-  {% csrf_token %}
-  <div class="field">
-    <label>Child's Name</label>
-    {{ form.child_name }}
-  </div>
-  <div class="grid-2">
-    <div class="field">
-      <label>Gender</label>
-      {{ form.gender }}
-    </div>
-    <div class="field">
-      <label>Date of Birth</label>
-      {{ form.date_of_birth }}
-    </div>
-  </div>
-  <div class="field">
-    <label>State</label>
-    {{ form.state }}
-  </div>
-  <div class="field">
-    <label>Parent's WhatsApp No.</label>
-    {{ form.parent_whatsapp }}
-  </div>
-  <div style="display:flex; gap:10px; margin-top:12px">
-    <button class="btn" type="submit" name="_submit" value="1">Submit</button>
+<div class="page-intro">
+  <span class="page-eyebrow">Patient onboarding</span>
+  <h1>Add a patient record</h1>
+  <p class="page-subtitle">
+    Register the child once with the parent’s WhatsApp number, then continue with vaccination card updates or sharing.
+  </p>
+</div>
 
-    {# Only show when doctor is adding a record inside the portal #}
-    {% if show_send_button %}
-    <button class="btn" type="submit" name="send_to_patient" value="1"
-      title="Register the patient and open WhatsApp with a card link">
-      Register &amp; Send to Patient
-    </button>
-    {% endif %}
-  </div>
-</form>
+<div class="panel form-shell">
+  <form method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label>Child's Name</label>
+      {{ form.child_name }}
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Gender</label>
+        {{ form.gender }}
+      </div>
+      <div class="field">
+        <label>Date of Birth</label>
+        {{ form.date_of_birth }}
+      </div>
+    </div>
+    <div class="field">
+      <label>State</label>
+      {{ form.state }}
+    </div>
+    <div class="field">
+      <label>Parent's WhatsApp No.</label>
+      {{ form.parent_whatsapp }}
+    </div>
+    <div class="button-row">
+      <button class="btn" type="submit" name="_submit" value="1">Save Record</button>
+
+      {% if show_send_button %}
+      <button class="btn btn-soft" type="submit" name="send_to_patient" value="1"
+        title="Register the patient and open WhatsApp with a card link">
+        Register &amp; Send to Patient
+      </button>
+      {% endif %}
+    </div>
+  </form>
+</div>
 {% endblock %}

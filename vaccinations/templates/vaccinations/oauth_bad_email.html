@@ -1,12 +1,16 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Wrong Google Account{% endblock %}
 {% block content %}
-  <h2>Sign in with the correct Google account</h2>
-  <p class="muted">You signed in as <strong>{{ actual }}</strong>, but this portal belongs to
-     <strong>{{ expected }}</strong> (Dr. {{ doctor.full_name }}).</p>
-  <div style="margin-top:16px">
-    <a class="btn" href="{{ retry_url }}">Use another Google account</a>
-    <a class="btn" href="{% url 'vaccinations:home' %}" style="margin-left:10px;">Cancel</a>
-  </div>
-{% endblock %}
+<div class="page-intro">
+  <span class="page-eyebrow">Authentication</span>
+  <h1>Sign in with the correct Google account</h1>
+  <p class="page-subtitle">You signed in as <strong>{{ actual }}</strong>, but this portal belongs to <strong>{{ expected }}</strong> (Dr. {{ doctor.full_name }}).</p>
+</div>
 
+<div class="panel form-shell">
+  <div class="button-row">
+    <a class="btn" href="{{ retry_url }}">Use Another Google Account</a>
+    <a class="btn btn-secondary" href="{% url 'vaccinations:home' %}">Cancel</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,33 +1,61 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Doctor Portal{% endblock %}
 {% block content %}
-<h2>Welcome, Dr. {{ doctor.full_name }}</h2>
-<p class="muted">{{ doctor.clinic.name }}{% if doctor.clinic.state %} • {{ doctor.clinic.state }}{% endif %}</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Welcome, Dr. {{ doctor.full_name }}</h1>
+  <p class="page-subtitle">
+    {{ doctor.clinic.name }}{% if doctor.clinic.state %} • {{ doctor.clinic.state }}{% endif %}. Manage patient records, vaccination cards, and follow-up reminders from one place.
+  </p>
+</div>
 
-{% if doctor.photo %}
-  <div style="margin:15px 0;">
-    <img src="{{ doctor.photo.url }}" alt="Doctor photo"
-         style="max-width:140px;border-radius:6px;border:1px solid #eee" />
+<div class="stack-lg">
+  <div class="hero-card card profile-card">
+    <div class="profile-card__media">
+      {% if doctor.photo %}
+        <img class="profile-card__photo" src="{{ doctor.photo.url }}" alt="Doctor photo" />
+      {% endif %}
+      <div class="stack-sm">
+        <div class="inline-meta">
+          <span class="chip"><span class="chip-label">Clinic</span>{{ doctor.clinic.name }}</span>
+          {% if doctor.clinic.state %}
+            <span class="chip"><span class="chip-label">State</span>{{ doctor.clinic.state }}</span>
+          {% endif %}
+        </div>
+        <p class="muted">Use the actions below to register patients, update cards, review reminders, or maintain the clinic profile.</p>
+      </div>
+    </div>
   </div>
-{% endif %}
 
-<div class="grid-2" style="margin-top:18px;">
-  <a class="btn btn-block" href="{% url 'vaccinations:doc-add' doctor.portal_token %}">Add-a-patient</a>
-  <a class="btn btn-block" href="{% url 'vaccinations:doc-update' doctor.portal_token %}">Update a patient record</a>
-</div>
+  <div class="portal-grid">
+    <article class="action-card">
+      <h3>Add a patient</h3>
+      <p>Create a new patient record and optionally send the card link to the parent immediately.</p>
+      <a class="btn btn-block" href="{% url 'vaccinations:doc-add' doctor.portal_token %}">Add a Patient</a>
+    </article>
 
-<div style="margin-top:18px;">
-  <a class="btn btn-block" href="{% url 'vaccinations:doc-reminders' doctor.portal_token %}">Reminders</a>
-</div>
+    <article class="action-card">
+      <h3>Update records</h3>
+      <p>Search by parent WhatsApp number and update vaccine entries for existing children in your clinic.</p>
+      <a class="btn btn-secondary btn-block" href="{% url 'vaccinations:doc-update' doctor.portal_token %}">Update a Patient Record</a>
+    </article>
 
-<div style="margin-top:18px;">
-  <a class="btn btn-block" href="{% url 'vaccinations:doc-profile' doctor.portal_token %}">Edit doctor/clinic profile</a>
-</div>
+    <article class="action-card">
+      <h3>Reminders</h3>
+      <p>Review due and overdue doses across the clinic and send follow-up reminders to parents.</p>
+      <a class="btn btn-soft btn-block" href="{% url 'vaccinations:doc-reminders' doctor.portal_token %}">Open Reminders</a>
+    </article>
 
-<div style="margin-top:18px;">
-  <form method="post" action="{% url 'vaccinations:doc-logout' doctor.portal_token %}" style="display: inline;">
+    <article class="action-card">
+      <h3>Doctor and clinic profile</h3>
+      <p>Keep doctor contact details, clinic information, languages, and registration information up to date.</p>
+      <a class="btn btn-secondary btn-block" href="{% url 'vaccinations:doc-profile' doctor.portal_token %}">Edit Profile</a>
+    </article>
+  </div>
+
+  <form method="post" action="{% url 'vaccinations:doc-logout' doctor.portal_token %}">
     {% csrf_token %}
-    <button type="submit" class="btn btn-secondary btn-block">Logout</button>
+    <button type="submit" class="btn btn-secondary">Logout</button>
   </form>
 </div>
 {% endblock %}

@@ -9,127 +9,80 @@
 {% endblock %}
 
 {% block content %}
-<div class="vh">  {# <- page wrapper: '.vh' #}
+<div class="vh stack-lg">
+  <section class="card history-hero">
+    <div class="page-intro">
+      <span class="page-eyebrow">Parent history</span>
+      <h1 class="vh-title">{{ ui.title }}</h1>
+      <p class="page-subtitle">{{ ui.note }}</p>
+    </div>
 
-  <div class="card"
-    style="padding:24px; margin-bottom:20px; background:#f3e8ff; border-radius:18px; box-shadow:0 2px 8px #e9d5ff;">
-    <h1 style="margin:0 0 10px 0; font-size:2.2em; font-weight:700; color:#6d28d9;">{{ ui.title }}</h1>
-    <p class="muted" style="font-size:1.1em; margin-bottom:16px;">{{ ui.note }}</p>
-
-    <div style="display:flex; gap:32px; margin-bottom:18px;">
-      <!-- Child Name -->
-      <div style="display:flex; align-items:center;">
-        <span
-          style="background:#ede9fe; color:#8b5cf6; border-radius:6px 0 0 6px; padding:10px 12px; font-weight:600;">
-          {{ ui.child_name_label }}
-        </span>
-        <span
-          style="background:#a78bfa; color:#fff; border-radius:0 6px 6px 0; padding:10px 18px; font-weight:700;">
-          {{ child.get_child_name }}
-        </span>
+    <div class="history-metrics">
+      <div class="history-metric">
+        <span class="history-metric__label">{{ ui.child_name_label }}</span>
+        <span class="history-metric__value">{{ child.get_child_name }}</span>
       </div>
-
-      <!-- Date of Birth -->
-      <div style="display:flex; align-items:center;">
-        <span
-          style="background:#ede9fe; color:#8b5cf6; border-radius:6px 0 0 6px; padding:10px 12px; font-weight:600;">
-          {{ ui.child_dob_label }}
-        </span>
-        <span
-          style="background:#a78bfa; color:#fff; border-radius:0 6px 6px 0; padding:10px 18px; font-weight:700;">
-          {{ child.get_date_of_birth_encrypted|date:"Y-m-d" }}
-        </span>
+      <div class="history-metric">
+        <span class="history-metric__label">{{ ui.child_dob_label }}</span>
+        <span class="history-metric__value">{{ child.get_date_of_birth_encrypted|date:"Y-m-d" }}</span>
       </div>
-
-      <!-- Gender (optional) -->
       {% if child.gender %}
-      <div style="display:flex; align-items:center;">
-        <span
-          style="background:#ede9fe; color:#8b5cf6; border-radius:6px 0 0 6px; padding:10px 12px; font-weight:600;">
-          {{ ui.gender_label }}
-        </span>
-        <span
-          style="background:#a78bfa; color:#fff; border-radius:0 6px 6px 0; padding:10px 18px; font-weight:700;">
-          {{ child.get_gender_display }}
-        </span>
+      <div class="history-metric">
+        <span class="history-metric__label">{{ ui.gender_label }}</span>
+        <span class="history-metric__value">{{ child.get_gender_display }}</span>
       </div>
       {% endif %}
     </div>
 
-    <div style="display:flex; gap:14px; margin-bottom:10px;">
-      <a class="btn main-btn" href="{% url 'vaccinations:card-all' child.id %}?next=history">{{ ui.update_due }}</a>
-      <a class="btn main-btn" href="{% url 'vaccinations:add' %}">{{ ui.add_child }}</a>
-      <a class="btn main-btn" href="{% url 'vaccinations:card' child.id %}?next=history">{{ ui.back }}</a>
+    <div class="button-row">
+      <a class="btn btn-soft" href="{% url 'vaccinations:card-all' child.id %}?next=history">{{ ui.update_due }}</a>
+      <a class="btn btn-secondary" href="{% url 'vaccinations:add' %}">{{ ui.add_child }}</a>
+      <a class="btn btn-secondary" href="{% url 'vaccinations:card' child.id %}?next=history">{{ ui.back }}</a>
     </div>
-  </div>
+  </section>
 
-  <div style="margin-top:18px;">
-    <div
-      style="background:#c4b5fd; color:#4c1d95; font-size:1.5em; font-weight:700; padding:12px 0; border-radius:14px; text-align:center; margin-bottom:10px;">
-      {{ ui.title_history }}
+  <section class="stack-md">
+    <div class="history-section-title">{{ ui.title_history }}</div>
+
+    <div class="table-shell">
+      <table class="table history-table">
+        <thead>
+          <tr>
+            <th>{{ t.vaccine_name }}</th>
+            <th>{{ t.status }}</th>
+            <th>{{ t.action }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>
+              <a class="history-link" href="{% url 'vaccinations:parent-edu' r.vaccine_id %}?child={{ child.id }}" target="_blank">
+                {{ r.vaccine_name }} — {{ r.dose_label }}
+              </a>
+              {% if r.vaccine_subtitle %}
+              <div class="muted">{{ r.vaccine_subtitle }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {% include "vaccinations/_status_badge.html" with row=r ui=ui %}
+            </td>
+            <td>
+              {% if child.clinic and child.clinic.phone %}
+              <a class="btn btn-secondary btn-call" href="tel:{{ child.clinic.phone|phone_e164 }}">{{ t.call_clinic }}</a>
+              {% else %}
+              <a class="btn btn-secondary btn-call" href="tel:{{ doctor.clinic.phone|phone_e164 }}">{{ t.call_clinic }}</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="muted">Nothing to show.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-
-    <table class="table" style="width:100%; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px #e9d5ff;">
-      <thead style="background:#ede9fe;">
-        <tr>
-          <th style="padding:12px 8px; font-size:1.1em; color:#6d28d9;">{{ t.vaccine_name }}</th>
-          <th style="padding:12px 8px; font-size:1.1em; color:#6d28d9;">{{ t.status }}</th>
-          <th style="padding:12px 8px; font-size:1.1em; color:#6d28d9;">{{ t.action }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in rows %}
-        <tr style="background:#faf5ff; border-bottom:1px solid #e9d5ff;">
-          <td style="padding:10px 8px;">
-            <a href="{% url 'vaccinations:parent-edu' r.vaccine_id %}?child={{ child.id }}" target="_blank"
-              style="color:#6d28d9; font-weight:600; text-decoration:underline;">
-              {{ r.vaccine_name }} — {{ r.dose_label }}
-            </a>
-            {% if r.vaccine_subtitle %}
-            <div class="muted">{{ r.vaccine_subtitle }}</div>
-            {% endif %}
-          </td>
-          <td style="padding:10px 8px;">
-            {% include "vaccinations/_status_badge.html" with row=r ui=ui %}
-          </td>
-          <td style="padding:10px 8px;">
-            {% if child.clinic and child.clinic.phone %}
-            <a class="btn call-btn" href="tel:{{ child.clinic.phone|phone_e164 }}">{{ t.call_clinic }}</a>
-            {% else %}
-            <a class="btn call-btn" href="tel:{{ doctor.clinic.phone|phone_e164 }}">{{ t.call_clinic }}</a>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3" class="muted">Nothing to show.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <style>
-    .main-btn {
-      background: #a78bfa !important;
-      color: #fff !important;
-      font-weight: 600;
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 1em;
-      box-shadow: 0 1px 4px #e9d5ff;
-    }
-
-    .call-btn {
-      background: #a78bfa !important;
-      color: #fff !important;
-      font-weight: 600;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 1em;
-      box-shadow: 0 1px 4px #e9d5ff;
-    }
-  </style>
-
-</div>  {# end of .vh wrapper #}
+  </section>
+</div>
 {% endblock %}

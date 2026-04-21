@@ -1,22 +1,32 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}New Partner{% endblock %}
 {% block content %}
-<h2>Create Partner & Upload Field Reps</h2>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <div class="field">
-    <label>Partner Name</label>
-    <input type="text" name="partner_name" required>
+<div class="page-intro">
+  <span class="page-eyebrow">Partner provisioning</span>
+  <h1>Create a partner and upload field reps</h1>
+  <p class="page-subtitle">Create the partner profile, then upload the field-rep CSV so doctor onboarding links can be distributed cleanly.</p>
+</div>
+
+<div class="stack-md">
+  <div class="panel form-shell">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label>Partner Name</label>
+        <input type="text" name="partner_name" required>
+      </div>
+      <div class="field">
+        <label>Field Reps CSV (rep_code, full_name)</label>
+        <input type="file" name="csv_file" accept=".csv">
+      </div>
+      <button class="btn">Create</button>
+    </form>
   </div>
-  <div class="field">
-    <label>Field Reps CSV (rep_code, full_name)</label>
-    <input type="file" name="csv_file" accept=".csv">
-  </div>
-  <button class="btn">Create</button>
-</form>
+
 {% if created %}
-<div class="msg msg-success" style="margin-top:14px">
+<div class="msg msg-success">
   Partner created. Share this doctor registration link: {{ registration_link }}
 </div>
 {% endif %}
+</div>
 {% endblock %}

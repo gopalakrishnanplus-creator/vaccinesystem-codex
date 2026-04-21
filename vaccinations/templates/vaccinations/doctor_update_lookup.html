@@ -1,14 +1,20 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Update Patient — Doctor{% endblock %}
 {% block content %}
-<h2>Update a patient record</h2>
-<p class="muted">Enter the parent's WhatsApp number to view/update records (scoped to your clinic).</p>
-<form method="post">
-  {% csrf_token %}
-  <div class="field">
-    <label>Parent's WhatsApp No.</label>
-    {{ form.parent_whatsapp }}
-  </div>
-  <button class="btn">Proceed</button>
-</form>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Update a patient record</h1>
+  <p class="page-subtitle">Search by the parent’s WhatsApp number to find patients inside your clinic only.</p>
+</div>
+
+<div class="panel form-shell">
+  <form method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label>Parent's WhatsApp No.</label>
+      {{ form.parent_whatsapp }}
+    </div>
+    <button class="btn">Continue</button>
+  </form>
+</div>
 {% endblock %}

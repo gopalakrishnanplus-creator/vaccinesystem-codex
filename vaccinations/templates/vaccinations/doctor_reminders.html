@@ -1,10 +1,13 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Reminders — {{ doctor.clinic.name }}{% endblock %}
 {% block content %}
-<h2>Reminders</h2>
-<p class="muted">Due/overdue doses across your clinic. "Overdue Today" remains visible for 3 days.</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Doctor portal</span>
+  <h1>Reminders</h1>
+  <p class="page-subtitle">Track due and overdue doses across your clinic. “Overdue Today” remains visible for three days.</p>
+</div>
 
-<form method="get" style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 16px;">
+<form method="get" class="filter-bar">
   <select name="status">
     <option value="overdue_today" {% if status_filter == 'overdue_today' %}selected{% endif %}>
       Overdue Today (with 3‑day retention)
@@ -27,55 +30,60 @@
   <button class="btn" type="submit">Apply</button>
 </form>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Child</th>
-      <th>Vaccine</th>
-      <th>Due Date</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for r in rows %}
-    <tr>
-      <td>
-        <strong>{{ r.child.full_name }}</strong>
-        <div class="muted">{{ r.child.parent.whatsapp_e164 }}</div>
-      </td>
-      <td>
-        {% if r.vaccine %}
-        <a href="{% url 'vaccinations:doc-vaccine-edu' doctor.portal_token r.vaccine.id %}" target="_blank">
-          {{ r.vaccine.name }}
-        </a>
-        {% else %}
-        <span class="muted">Unknown Vaccine</span>
-        {% endif %}
-      </td>
-      <td>{{ r.due_date|date:"d M Y" }}</td>
-      <td>
-        {% if r.status == 'due' %}Due today ({{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'overdue_today' %}Overdue (due {{ r.due_date|date:"d M Y" }})
-        {% elif r.status == 'upcoming_24h' %}Upcoming ({{ r.due_date|date:"d M Y" }})
-        {% else %}{{ r.status }}
-        {% endif %}
-      </td>
-      <td>
-        {% if r.sent_at %}
-        <span class="btn btn-success">Reminder Sent — {{ r.sent_at|date:"d M, h:i a" }}</span>
-        {% elif r.eligible %}
-        <a class="btn" href="{% url 'vaccinations:doc-send-reminder' doctor.portal_token r.cd.id %}">Send Reminder</a>
-        {% else %}
-        <span class="muted">Not eligible</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="5" class="muted">Nothing to show for this filter.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-shell">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Child</th>
+        <th>Vaccine</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>
+          <strong>{{ r.child.full_name }}</strong>
+          <div class="muted">{{ r.child.parent.whatsapp_e164 }}</div>
+        </td>
+        <td>
+          {% if r.vaccine %}
+          <a href="{% url 'vaccinations:doc-vaccine-edu' doctor.portal_token r.vaccine.id %}" target="_blank">
+            {{ r.vaccine.name }}
+          </a>
+          {% else %}
+          <span class="muted">Unknown Vaccine</span>
+          {% endif %}
+        </td>
+        <td>{{ r.due_date|date:"d M Y" }}</td>
+        <td>
+          {% if r.status == 'due' %}Due today ({{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'overdue_today' %}Overdue (due {{ r.due_date|date:"d M Y" }})
+          {% elif r.status == 'upcoming_24h' %}Upcoming ({{ r.due_date|date:"d M Y" }})
+          {% else %}{{ r.status }}
+          {% endif %}
+        </td>
+        <td>
+          {% if r.sent_at %}
+          <div class="stack-sm">
+            <span class="status">Sent</span>
+            <span class="muted">{{ r.sent_at|date:"d M, h:i a" }}</span>
+          </div>
+          {% elif r.eligible %}
+          <a class="btn" href="{% url 'vaccinations:doc-send-reminder' doctor.portal_token r.cd.id %}">Send Reminder</a>
+          {% else %}
+          <span class="muted">Not eligible</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="muted">Nothing to show for this filter.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

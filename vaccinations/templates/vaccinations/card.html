@@ -1,91 +1,106 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Vaccination Card{% endblock %}
 {% block content %}
-<h2>Vaccination Card</h2>
-<p><strong>Child:</strong> {{ child.get_child_name }} &nbsp; <span class="muted">(DOB {{ child.get_date_of_birth_encrypted }})</span></p>
+<div class="page-intro">
+  <span class="page-eyebrow">{% if doctor %}Doctor card view{% else %}Vaccination card{% endif %}</span>
+  <h1>Vaccination card</h1>
+  <div class="inline-meta">
+    <span class="chip"><span class="chip-label">Child</span>{{ child.get_child_name }}</span>
+    <span class="chip"><span class="chip-label">DOB</span>{{ child.get_date_of_birth_encrypted }}</span>
+  </div>
+</div>
 
-{% if show_all %}
-<p class="muted">
-  Full schedule — includes past, today and future items.
-  {% if doctor %}
-    <a href="{% url 'vaccinations:doc-card' doctor.portal_token child.id %}">Show due only</a>
+<div class="panel surface-muted stack-sm">
+  {% if show_all %}
+  <p class="muted">Full schedule view. This includes past, current, and future doses for the child.</p>
   {% else %}
-    <a href="{% url 'vaccinations:card' child.id %}">Show due only</a>
+  <p class="muted">Due-only view. Future vaccines are hidden so you can focus on doses that matter today.</p>
   {% endif %}
-</p>
-{% else %}
-<p class="muted">
-  Showing vaccines that should have been given up to today. Future vaccines are hidden.
-  {% if doctor %}
-    <a href="{% url 'vaccinations:doc-card-all' doctor.portal_token child.id %}">Show full schedule</a>
-  {% else %}
-    <a href="{% url 'vaccinations:card-all' child.id %}">Show full schedule</a>
-  {% endif %}
-</p>
-{% endif %}
 
-<form method="post" novalidate autocomplete="off">
+  <div class="button-row">
+    {% if show_all %}
+      {% if doctor %}
+      <a class="btn btn-secondary" href="{% url 'vaccinations:doc-card' doctor.portal_token child.id %}">Show Due Only</a>
+      {% else %}
+      <a class="btn btn-secondary" href="{% url 'vaccinations:card' child.id %}">Show Due Only</a>
+      {% endif %}
+    {% else %}
+      {% if doctor %}
+      <a class="btn btn-secondary" href="{% url 'vaccinations:doc-card-all' doctor.portal_token child.id %}">Show Full Schedule</a>
+      {% else %}
+      <a class="btn btn-secondary" href="{% url 'vaccinations:card-all' child.id %}">Show Full Schedule</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<form method="post" novalidate autocomplete="off" class="stack-lg">
   {% csrf_token %}
-  <ul class="list">
+
+  {% if rows %}
+  <ul class="record-list">
     {% for r in rows %}
-    <li>
-      <div>
-        <strong>{{ r.vaccine_name }}</strong>
-        <span class="muted">— {{ r.dose_label }}</span>
+    <li class="record-list__item">
+      <div class="record-list__top">
+        <div>
+          <h3>{{ r.vaccine_name }}</h3>
+          <div class="record-list__subtitle">{{ r.dose_label }}</div>
+        </div>
+        <span class="status">
+          {% if r.status == 'given' %}Given
+          {% elif r.status == 'future' %}Future
+          {% elif r.status == 'waiting-previous' %}Waiting
+          {% elif r.status == 'overdue' %}Overdue
+          {% else %}Due
+          {% endif %}
+        </span>
       </div>
 
-      <div style="margin-top:6px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="record-list__controls">
         {% if r.status == 'given' %}
-        <!-- Show previous entry (green, not editable) - using readonly instead of disabled -->
         <input class="input-green" type="text" value="{{ r.child_dose.given_date|date:'d M Y' }}" readonly>
-        <span class="status">given</span>
 
         {% elif r.status == 'future' %}
-        {% if r.due_display %}<span class="muted">Due: {{ r.due_display|date:"Y-m-d" }}</span>{% endif %}
+        {% if r.due_display %}<span class="muted">Due {{ r.due_display|date:"Y-m-d" }}</span>{% endif %}
         <input class="input-disabled" type="date" disabled>
-        <span class="status">future</span>
 
         {% elif r.status == 'waiting-previous' %}
         <span class="muted">Awaiting previous dose{% if r.prev_label %}: {{ r.prev_label }}{% endif %}</span>
         <input class="input-disabled" type="date" disabled>
-        <span class="status">waiting</span>
 
         {% else %}
-        <!-- IMPORTANT: the input must be type=date and have a predictable name -->
-        {% if r.due_display %}<span class="muted">Due: {{ r.due_display|date:"Y-m-d" }}</span>{% endif %}
-        <input 
-          type="date" 
-          name="dose_{{ r.child_dose.id }}" 
+        {% if r.due_display %}<span class="muted">Due {{ r.due_display|date:"Y-m-d" }}</span>{% endif %}
+        <input
+          type="date"
+          name="dose_{{ r.child_dose.id }}"
           class="{% if r.editable %}input-pink{% else %}input-disabled{% endif %}"
           value=""
           placeholder="yyyy-mm-dd"
           max="{{ today|date:'Y-m-d' }}">
-        <span class="status">{% if r.status == 'overdue' %}overdue{% else %}due{% endif %}</span>
         {% endif %}
       </div>
     </li>
     {% endfor %}
   </ul>
 
-  {% if rows %}
-  <div style="margin-top:16px;">
-    <button class="btn btn-primary" type="submit">Update</button>
+  <div class="button-row">
+    <button class="btn" type="submit">Update Card</button>
     {% if show_all %}
       {% if doctor %}
-        <a class="btn btn-link" href="{% url 'vaccinations:doc-card' doctor.portal_token child.id %}">Show due only</a>
+      <a class="btn btn-link" href="{% url 'vaccinations:doc-card' doctor.portal_token child.id %}">Show due only</a>
       {% else %}
-        <a class="btn btn-link" href="{% url 'vaccinations:card' child.id %}">Show due only</a>
+      <a class="btn btn-link" href="{% url 'vaccinations:card' child.id %}">Show due only</a>
       {% endif %}
     {% else %}
       {% if doctor %}
-        <a class="btn btn-link" href="{% url 'vaccinations:doc-card-all' doctor.portal_token child.id %}">Show full schedule</a>
+      <a class="btn btn-link" href="{% url 'vaccinations:doc-card-all' doctor.portal_token child.id %}">Show full schedule</a>
       {% else %}
-        <a class="btn btn-link" href="{% url 'vaccinations:card-all' child.id %}">Show full schedule</a>
+      <a class="btn btn-link" href="{% url 'vaccinations:card-all' child.id %}">Show full schedule</a>
       {% endif %}
     {% endif %}
   </div>
   {% else %}
-  <div class="muted" style="margin-top:12px;">No vaccines to display.</div>
+  <div class="empty-state">No vaccines to display.</div>
   {% endif %}
 </form>
 {% endblock %}

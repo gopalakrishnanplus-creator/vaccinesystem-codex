@@ -1,28 +1,35 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Doctor Registration{% endblock %}
 {% block content %}
-<h2>Doctor Registration</h2>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <div class="field"><label>Doctor's Name*</label> {{ form.doctor_name }}</div>
-  <div class="field"><label>Doctor's WhatsApp Number*</label> {{ form.doctor_whatsapp }}</div>
-  <div class="field"><label>Clinic WhatsApp Number</label> {{ form.clinic_whatsapp }}</div>
-  <div class="field"><label>Upload Doctor Photo</label> {{ form.doctor_photo }}</div>
-  <div class="field"><label>State*</label> {{ form.state }}</div>
-  <div class="field"><label>Head Quarters</label> {{ form.head_quarters }}</div>
-  <div class="field"><label>Clinic Address</label> {{ form.clinic_address }}</div>
-  <div class="field"><label>Choose Preferred Languages</label> {{ form.preferred_languages }}</div>
-  <div class="field"><label>Pincode</label> {{ form.pincode }}</div>
-  <div class="field"><label>Doctor's Email ID*</label> {{ form.doctor_email }}{{ form.doctor_email.errors }}</div>
-  <div class="field"><label>Receptionist's Email ID</label> {{ form.receptionist_email }}</div>
-  <div class="field"><label>Indian Medical Council Number*</label> {{ form.imc_number }}</div>
+<div class="page-intro">
+  <span class="page-eyebrow">{% if mode == "partner" %}Partner onboarding{% else %}Doctor onboarding{% endif %}</span>
+  <h1>Doctor registration</h1>
+  <p class="page-subtitle">Set up the doctor and clinic details once so the portal can be used for patient registration, vaccination cards, and reminders.</p>
+</div>
 
-  {% if mode == "partner" %}
-  <div class="field"><label>Field Rep Code*</label> {{ form.field_rep_code }}</div>
-  <div class="field"><label>Field Rep Name*</label> {{ form.field_rep_name }}</div>
-  {% endif %}
+<div class="panel form-shell">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="field"><label>Doctor's Name*</label> {{ form.doctor_name }}</div>
+    <div class="field"><label>Doctor's WhatsApp Number*</label> {{ form.doctor_whatsapp }}</div>
+    <div class="field"><label>Clinic WhatsApp Number</label> {{ form.clinic_whatsapp }}</div>
+    <div class="field"><label>Upload Doctor Photo</label> {{ form.doctor_photo }}</div>
+    <div class="field"><label>State*</label> {{ form.state }}</div>
+    <div class="field"><label>Head Quarters</label> {{ form.head_quarters }}</div>
+    <div class="field"><label>Clinic Address</label> {{ form.clinic_address }}</div>
+    <div class="field"><label>Choose Preferred Languages</label> {{ form.preferred_languages }}</div>
+    <div class="field"><label>Pincode</label> {{ form.pincode }}</div>
+    <div class="field"><label>Doctor's Email ID*</label> {{ form.doctor_email }}{{ form.doctor_email.errors }}</div>
+    <div class="field"><label>Receptionist's Email ID</label> {{ form.receptionist_email }}</div>
+    <div class="field"><label>Indian Medical Council Number*</label> {{ form.imc_number }}</div>
 
-  <button class="btn">Register</button>
-</form>
+    {% if mode == "partner" %}
+    <div class="field"><label>Field Rep Code*</label> {{ form.field_rep_code }}</div>
+    <div class="field"><label>Field Rep Name*</label> {{ form.field_rep_name }}</div>
+    {% endif %}
+
+    <button class="btn">Register</button>
+  </form>
+</div>
 
 {% endblock %}

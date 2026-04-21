@@ -1,11 +1,17 @@
 {% extends "vaccinations/base.html" %}
 {% block title %}Authentication Error{% endblock %}
 {% block content %}
-<h2>Authentication Error</h2>
-<p class="muted">{{ message }}</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Authentication</span>
+  <h1>Authentication error</h1>
+  <p class="page-subtitle">{{ message }}</p>
+</div>
+
 {% if show_retry %}
-<div style="margin-top:16px">
-  <a class="btn" href="{% url 'vaccinations:home' %}">Try Again</a>
+<div class="panel form-shell">
+  <div class="button-row">
+    <a class="btn" href="{% url 'vaccinations:home' %}">Try Again</a>
+  </div>
 </div>
 {% endif %}
 {% endblock %}

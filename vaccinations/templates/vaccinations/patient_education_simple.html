@@ -2,30 +2,29 @@
 {% load media %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-
-<h2 style="margin-bottom:6px">{{ vaccine.name }}</h2>
-<p class="muted">Educational videos for this vaccine</p>
+<div class="page-intro">
+  <span class="page-eyebrow">Vaccine education</span>
+  <h1>{{ vaccine.name }}</h1>
+  <p class="page-subtitle">Educational videos for this vaccine</p>
+</div>
 
 {% if videos_by_lang %}
   {% for lang, videos in videos_by_lang.items %}
-    <h3 style="margin-top:20px;">Language: {{ lang|upper }}</h3>
-    <div style="display:flex; flex-direction:column; gap:24px">
+    <h2 class="video-language">Language: {{ lang|upper }}</h2>
+    <div class="video-stack">
       {% for v in videos %}
-      <div style="border:1px solid #eee; border-radius:10px; padding:12px; background:#fafafa;">
-        <div style="font-weight:600; margin-bottom:8px;">
+      <div class="video-card">
+        <div class="video-card__title">
           {{ v.title|default:v.language|upper }}
         </div>
 
         {% youtube_embed v.video_url as embed_src %}
         
         {% if embed_src %}
-          <!-- YouTube Player with Error Handling -->
-          <div id="player-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
-               style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-top:8px;">
+          <div id="player-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="video-embed">
             <iframe 
               id="yt-player-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
               src="{{ embed_src }}"
-              style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
               loading="lazy"
@@ -34,41 +33,34 @@
               onload="handleYouTubeLoad(this)">
             </iframe>
             
-            <!-- Loading Spinner -->
-            <div id="loading-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
-                 style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-              <div style="border:4px solid #f3f3f3; border-top:4px solid #1976d2; border-radius:50%; width:40px; height:40px; animation:spin 2s linear infinite; margin:0 auto;"></div>
-              <p>Loading video...</p>
+            <div id="loading-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="video-loader">
+              <div class="video-loader__inner">
+                <div class="video-spinner"></div>
+                <p>Loading video...</p>
+              </div>
             </div>
           </div>
           
-          <!-- Fallback Container (Hidden Initially) -->
           <div id="fallback-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
-               style="display:none; background:#fff3cd; padding:15px; border-radius:6px; margin-top:8px;">
-            <p style="margin:0 0 10px 0; color:#856404;">
+               class="video-fallback" style="display:none;">
+            <p>
               <strong>Video playback issue detected</strong><br>
               This video failed to load properly.
             </p>
-            <a href="{{ v.video_url }}" target="_blank" rel="noopener"
-               style="background:#1976d2; color:white; padding:8px 16px; border-radius:4px; text-decoration:none; display:inline-block;">
-              Watch Directly on YouTube ↗
-            </a>
-            <button onclick="retryVideo('{{ embed_src }}', '{{ forloop.parentloop.counter }}-{{ forloop.counter }}')"
-                    style="background:#28a745; color:white; padding:8px 16px; border-radius:4px; border:none; margin-left:10px; cursor:pointer;">
-              Retry Loading
-            </button>
+            <div class="video-fallback__actions">
+              <a class="btn" href="{{ v.video_url }}" target="_blank" rel="noopener">Watch Directly on YouTube</a>
+              <button class="btn btn-success" type="button" onclick="retryVideo('{{ embed_src }}', '{{ forloop.parentloop.counter }}-{{ forloop.counter }}')">Retry Loading</button>
+            </div>
           </div>
           
         {% else %}
-          <!-- Invalid URL Case -->
-          <div style="background:#ffebee; color:#c62828; padding:12px; border-radius:6px; margin-top:8px;">
-            <p style="margin:0 0 8px 0;">
+          <div class="video-fallback video-fallback--error">
+            <p>
               <strong>Invalid video URL</strong>
             </p>
             {% if v.video_url %}
-              <a class="btn" href="{{ v.video_url }}" target="_blank" rel="noopener" 
-                 style="background:#c62828; color:white; padding:6px 12px; border-radius:4px; text-decoration:none;">
-                 Open on YouTube ↗
+              <a class="btn btn-danger" href="{{ v.video_url }}" target="_blank" rel="noopener">
+                 Open on YouTube
               </a>
             {% endif %}
           </div>
@@ -78,7 +70,7 @@
     </div>
   {% endfor %}
 {% else %}
-  <p class="muted">No videos are available for this vaccine yet.</p>
+  <div class="empty-state">No videos are available for this vaccine yet.</div>
 {% endif %}
 
 <!-- JavaScript for YouTube Error Handling -->
@@ -162,42 +154,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }, 8000);
 });
-
-// CSS for loading animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-`;
-document.head.appendChild(style);
 </script>
-
-<style>
-  .btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background: #1976d2;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-  }
-  .btn:hover {
-    background: #1565c0;
-  }
-  
-  /* Loading animation */
-  @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-</style>
-
-<p style="margin-top:16px;">
-  <a class="btn" href="javascript:history.back()">← Back</a>
-</p>
+<div class="back-row">
+  <a class="btn btn-secondary" href="javascript:history.back()">Back</a>
+</div>
 
 {% endblock %}
