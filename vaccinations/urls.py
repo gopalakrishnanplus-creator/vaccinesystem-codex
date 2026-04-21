@@ -51,6 +51,7 @@ urlpatterns = [
     # OAuth endpoints
     path("auth/google/start/", google_oauth_start, name="oauth-google-start"),
     path("auth/google/callback/", google_oauth_callback, name="oauth-google-callback"),
+    path("accounts/google/login/callback/", google_oauth_callback, name="oauth-google-callback-legacy"),
     path("d/<str:token>/logout/", DoctorLogoutView.as_view(), name="doc-logout"),
     # Parent share link
     path("p/<str:token>/", ParentShareStartView.as_view(), name="parent-share"),

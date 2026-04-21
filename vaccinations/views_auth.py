@@ -18,7 +18,10 @@ _OAUTH_STASH = "oauth_state"
 _DOCTOR_AUTH = "doctor_auth"
 
 def _redirect_uri(request):
-    # Always compute; avoids localhost vs 127.0.0.1 surprises.
+    configured = settings.GOOGLE_OAUTH.get("REDIRECT_URI")
+    if configured:
+        return configured
+    # Fallback for local settings where only REDIRECT_PATH is defined.
     return request.build_absolute_uri(settings.GOOGLE_OAUTH["REDIRECT_PATH"])
 
 def _safe_next(request, raw_next: str | None) -> str:

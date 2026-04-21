@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -228,8 +229,8 @@ LOGIN_URL = "/auth/google/start/"
 # ---- Google OAuth (read secrets from .env file only) ----
 GOOGLE_CLIENT_ID = require_env("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = require_env("GOOGLE_CLIENT_SECRET")
-GOOGLE_OAUTH_REDIRECT_PATH = os.getenv("GOOGLE_OAUTH_REDIRECT_PATH", "/auth/google/callback/")
 GOOGLE_OAUTH_REDIRECT_URI = require_env("GOOGLE_OAUTH_REDIRECT_URI")
+GOOGLE_OAUTH_REDIRECT_PATH = urlparse(GOOGLE_OAUTH_REDIRECT_URI).path or "/auth/google/callback/"
 
 GOOGLE_OAUTH = {
     "CLIENT_ID": GOOGLE_CLIENT_ID,
