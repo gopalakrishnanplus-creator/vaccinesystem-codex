@@ -229,7 +229,7 @@ LOGIN_URL = "/auth/google/start/"
 # ---- Google OAuth (read secrets from .env file only) ----
 GOOGLE_CLIENT_ID = require_env("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = require_env("GOOGLE_CLIENT_SECRET")
-GOOGLE_OAUTH_REDIRECT_URI = require_env("GOOGLE_OAUTH_REDIRECT_URI")
+GOOGLE_OAUTH_REDIRECT_URI = require_env("GOOGLE_OAUTH_REDIRECT_URI").strip()
 GOOGLE_OAUTH_REDIRECT_PATH = urlparse(GOOGLE_OAUTH_REDIRECT_URI).path or "/auth/google/callback/"
 
 GOOGLE_OAUTH = {
@@ -238,7 +238,6 @@ GOOGLE_OAUTH = {
     "AUTH_URL": "https://accounts.google.com/o/oauth2/v2/auth",
     "TOKEN_URL": "https://oauth2.googleapis.com/token",
     "USERINFO_URL": "https://www.googleapis.com/oauth2/v2/userinfo",
-    "REDIRECT_PATH": GOOGLE_OAUTH_REDIRECT_PATH,
     "REDIRECT_URI": GOOGLE_OAUTH_REDIRECT_URI,
     "SCOPES": ["openid", "email", "profile"],
 }

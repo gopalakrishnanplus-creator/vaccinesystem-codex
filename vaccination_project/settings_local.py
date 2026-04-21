@@ -101,10 +101,11 @@ SESSION_SAVE_EVERY_REQUEST = True
 LOGIN_URL = "/auth/google/start/"
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "local-google-client-id")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "local-google-client-secret")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI", "http://127.0.0.1:8000/auth/google/callback/")
 GOOGLE_OAUTH = {
     "CLIENT_ID": GOOGLE_CLIENT_ID,
     "CLIENT_SECRET": GOOGLE_CLIENT_SECRET,
-    "REDIRECT_PATH": "/auth/google/callback/",
+    "REDIRECT_URI": GOOGLE_OAUTH_REDIRECT_URI,
     "SCOPES": ["openid", "email", "profile"],
 }
 

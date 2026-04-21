@@ -18,11 +18,11 @@ _OAUTH_STASH = "oauth_state"
 _DOCTOR_AUTH = "doctor_auth"
 
 def _redirect_uri(request):
-    configured = settings.GOOGLE_OAUTH.get("REDIRECT_URI")
+    configured = (settings.GOOGLE_OAUTH.get("REDIRECT_URI") or "").strip()
     if configured:
         return configured
-    # Fallback for local settings where only REDIRECT_PATH is defined.
-    return request.build_absolute_uri(settings.GOOGLE_OAUTH["REDIRECT_PATH"])
+    # Final fallback for local/dev if REDIRECT_URI is ever omitted.
+    return request.build_absolute_uri(reverse("vaccinations:oauth-google-callback"))
 
 def _safe_next(request, raw_next: str | None) -> str:
     # Prevent open redirects; only allow our own host.
