@@ -24,6 +24,7 @@ from vaccinations.utils_schedule import build_series_prev_maps
 from vaccinations.utils import today
 from .utils_schedule import clinical_display_label
 from .utils import last10_digits, phone_hash, normalize_msisdn
+from django.db import connections
 # -----------------------
 # Helpers
 # -----------------------
@@ -169,6 +170,50 @@ def _get_or_create_child_for_parent(
     )
     child.save(using="patients")
     return child, True
+
+
+def _create_parent_for_whatsapp(wa_input: str) -> Parent:
+    """
+    Create a Parent row against the live patients DB, populating both the new
+    encrypted columns and any legacy columns that still physically exist.
+    """
+    e164 = normalize_msisdn(wa_input)
+    conn = connections["patients"]
+    now = timezone.now()
+
+    with conn.cursor() as cursor:
+        columns = {
+            col.name
+            for col in conn.introspection.get_table_description(cursor, "parent")
+        }
+
+    values = {}
+    if "full_name" in columns:
+        values["full_name"] = ""
+    if "whatsapp_e164" in columns:
+        values["whatsapp_e164"] = e164
+    if "whatsapp_e164_enc" in columns:
+        from .crypto import encrypt_str
+        values["whatsapp_e164_enc"] = encrypt_str(e164)
+    if "whatsapp_hash" in columns:
+        values["whatsapp_hash"] = Parent.hash_for(e164)
+    if "created_at" in columns:
+        values["created_at"] = now
+
+    if not values:
+        raise RuntimeError("Parent table has no writable columns for compatibility insert.")
+
+    column_sql = ", ".join(f"`{name}`" for name in values)
+    placeholder_sql = ", ".join(["%s"] * len(values))
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            f"INSERT INTO `parent` ({column_sql}) VALUES ({placeholder_sql})",
+            list(values.values()),
+        )
+        parent_id = cursor.lastrowid
+
+    return Parent.objects.using("patients").get(pk=parent_id)
 
 def _route_to_child_list(request, parents_qs: QuerySet):
     """
@@ -346,9 +391,7 @@ class AddRecordView(View):
             from django.db import IntegrityError, transaction
             try:
                 with transaction.atomic(using="patients"):
-                    parent = Parent.objects.using("patients").create()
-                    parent.whatsapp_e164 = wa_input  # sets enc + hash via setter
-                    parent.save(using="patients")
+                    parent = _create_parent_for_whatsapp(wa_input)
             except IntegrityError:
                 # Handle rare race: someone else inserted the same number simultaneously
                 # Re-query to find the parent that was created by another process
@@ -1320,9 +1363,7 @@ class DoctorPortalAddRecordView(View):
             from django.db import IntegrityError, transaction
             try:
                 with transaction.atomic(using="patients"):
-                    parent = Parent.objects.using("patients").create()
-                    parent.whatsapp_e164 = wa_input  # sets enc + hash via setter
-                    parent.save(using="patients")
+                    parent = _create_parent_for_whatsapp(wa_input)
             except IntegrityError:
                 # Handle rare race: someone else inserted the same number simultaneously
                 # Re-query to find the parent that was created by another process
