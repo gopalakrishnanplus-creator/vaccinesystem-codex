@@ -137,6 +137,39 @@ def _set_parent_session(request, primary_parent: Parent, equivalent_parents: Que
     request.session[SESSION_PARENT_KEY] = primary_parent.id
     request.session[SESSION_PARENT_IDS] = ids
 
+
+def _get_or_create_child_for_parent(
+    *,
+    parent: Parent,
+    child_name: str,
+    date_of_birth,
+    sex: str | None = None,
+    state: str = "",
+    clinic_id: int | None = None,
+):
+    child = (
+        Child.objects.using("patients")
+        .filter(
+            parent_id=parent.id,
+            full_name=child_name,
+            date_of_birth=date_of_birth,
+        )
+        .first()
+    )
+    if child:
+        return child, False
+
+    child = Child(
+        parent_id=parent.id,
+        clinic_id=clinic_id,
+        full_name=child_name,
+        date_of_birth=date_of_birth,
+        sex=sex,
+        state=state or "",
+    )
+    child.save(using="patients")
+    return child, True
+
 def _route_to_child_list(request, parents_qs: QuerySet):
     """
     Render the selection page for ALL children of the equivalent parents.
@@ -326,15 +359,12 @@ class AddRecordView(View):
                     raise
             parents_qs = Parent.objects.using("patients").filter(pk=parent.pk)
 
-        # Use the legacy field names that still back the live model.
-        child, created = Child.objects.using("patients").get_or_create(
+        child, created = _get_or_create_child_for_parent(
             parent=parent,
-            full_name=form.cleaned_data["child_name"],
+            child_name=form.cleaned_data["child_name"],
             date_of_birth=form.cleaned_data["date_of_birth"],
-            defaults={
-                "sex": form.cleaned_data["gender"],
-                "state": form.cleaned_data["state"],
-            }
+            sex=form.cleaned_data["gender"],
+            state=form.cleaned_data["state"],
         )
 
         _set_parent_session(request, parent, parents_qs)
@@ -1303,17 +1333,13 @@ class DoctorPortalAddRecordView(View):
                     raise
             parents_qs = Parent.objects.using("patients").filter(pk=parent.pk)
 
-        # Match the public add flow and write against the patients DB explicitly.
-        # The live MySQL schema still requires the legacy columns such as `full_name`.
-        child, created = Child.objects.using("patients").get_or_create(
+        child, created = _get_or_create_child_for_parent(
             parent=parent,
-            full_name=form.cleaned_data["child_name"],
+            child_name=form.cleaned_data["child_name"],
             date_of_birth=form.cleaned_data["date_of_birth"],
-            defaults={
-                "clinic": self.doctor.clinic,
-                "sex": form.cleaned_data["gender"],
-                "state": form.cleaned_data["state"] or self.doctor.clinic.state,
-            },
+            clinic_id=self.doctor.clinic_id,
+            sex=form.cleaned_data["gender"],
+            state=form.cleaned_data["state"] or self.doctor.clinic.state,
         )
 
         if created:
