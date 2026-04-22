@@ -49,13 +49,25 @@ def youtube_embed(context, url: str) -> str:
         vid = _extract_youtube_id(url)
         if not vid:
             return ""
-        
-        params = urlencode({
+
+        request = context.get("request") if context else None
+        origin = ""
+        widget_referrer = ""
+        if request is not None:
+            origin = request.build_absolute_uri("/").rstrip("/")
+            widget_referrer = request.build_absolute_uri()
+
+        params_dict = {
             "playsinline": 1,
             "rel": 0,
-            "modestbranding": 1,
-        })
-        embed_url = f"https://www.youtube-nocookie.com/embed/{vid}?{params}"
+        }
+        if origin:
+            params_dict["origin"] = origin
+        if widget_referrer:
+            params_dict["widget_referrer"] = widget_referrer
+
+        params = urlencode(params_dict)
+        embed_url = f"https://www.youtube.com/embed/{vid}?{params}"
 
         return embed_url
         

@@ -33,6 +33,24 @@ def _require_doctor_auth(request, token: str):
     auth = request.session.get("doctor_auth") or {}
     return auth.get("token") == token
 
+
+def _prefer_external_video_player(request) -> bool:
+    """
+    Some in-app browsers strip the Referer header that YouTube now requires for
+    embedded playback (Error 153). In those environments, prefer opening the
+    video directly on YouTube instead of showing a broken iframe.
+    """
+    ua = (request.META.get("HTTP_USER_AGENT") or "").lower()
+    markers = (
+        "whatsapp",
+        "fbav",
+        "fban",
+        "instagram",
+        "messenger",
+        "line/",
+    )
+    return any(marker in ua for marker in markers)
+
 # OAuth constants and helpers
 OAUTH_STASH_KEY = "oauth_state"         # session key to keep state across redirect
 DOC_AUTH_SESSION_KEY = "doctor_oauth"   # session key once logged in
@@ -2109,6 +2127,7 @@ class PatientEducationView(View):
                 "videos_by_lang": videos_by_lang,
                 "selected_videos": selected_videos,
                 "lang": lang,
+                "force_external_video": _prefer_external_video_player(request),
             }
 
             # 🟩 STEP 5: Set language in session & cookie (to persist)
@@ -2128,5 +2147,6 @@ class PatientEducationView(View):
                 "videos_by_lang": {},
                 "selected_videos": [],
                 "lang": "en",
+                "force_external_video": _prefer_external_video_player(request),
                 "error": str(e)
             })

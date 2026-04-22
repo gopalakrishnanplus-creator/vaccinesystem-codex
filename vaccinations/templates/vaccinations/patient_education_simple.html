@@ -21,7 +21,7 @@
         {% youtube_embed v.video_url as embed_src %}
         {% youtube_watch_url v.video_url as watch_url %}
         
-        {% if embed_src %}
+        {% if embed_src and not force_external_video %}
           <div id="player-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="video-embed">
             <iframe 
               id="yt-player-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
@@ -29,7 +29,6 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
               loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin"
               title="YouTube video: {{ v.title|default:'Vaccine Education' }}"
               onerror="handleYouTubeError(this)"
               onload="handleYouTubeLoad(this)">
@@ -59,6 +58,19 @@
             <a class="btn btn-secondary" href="{{ watch_url|default:v.video_url }}" target="_blank" rel="noopener">
               Open in YouTube
             </a>
+          </div>
+
+        {% elif embed_src and force_external_video %}
+          <div class="video-fallback">
+            <p>
+              <strong>Open this video in YouTube</strong><br>
+              This browser is limiting embedded YouTube playback. Open the video directly for the most reliable experience.
+            </p>
+            <div class="video-fallback__actions">
+              <a class="btn" href="{{ watch_url|default:v.video_url }}" target="_blank" rel="noopener">
+                Watch on YouTube
+              </a>
+            </div>
           </div>
           
         {% else %}
