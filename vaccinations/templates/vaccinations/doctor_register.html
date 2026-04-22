@@ -17,7 +17,10 @@
     <div class="field"><label>State*</label> {{ form.state }}</div>
     <div class="field"><label>Head Quarters</label> {{ form.head_quarters }}</div>
     <div class="field"><label>Clinic Address</label> {{ form.clinic_address }}</div>
-    <div class="field"><label>Choose Preferred Languages</label> {{ form.preferred_languages }}</div>
+    <div class="field">
+      <label>Choose Preferred Languages</label>
+      <div class="choice-grid">{{ form.preferred_languages }}</div>
+    </div>
     <div class="field"><label>Pincode</label> {{ form.pincode }}</div>
     <div class="field"><label>Doctor's Email ID*</label> {{ form.doctor_email }}{{ form.doctor_email.errors }}</div>
     <div class="field"><label>Receptionist's Email ID</label> {{ form.receptionist_email }}</div>
