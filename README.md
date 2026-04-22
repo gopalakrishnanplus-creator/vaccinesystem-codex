@@ -62,3 +62,17 @@ What the script handles:
 - collects static files
 - writes or refreshes Gunicorn and Nginx config
 - restarts `gunicorn-vaccine` and Nginx
+
+Optional HTTPS setup with Let's Encrypt:
+
+```bash
+cd /var/www/vaccinesystem
+ENABLE_HTTPS=1 LETSENCRYPT_EMAIL=you@example.com ./deploy.sh
+```
+
+That mode will:
+
+- install `certbot` and `python3-certbot-nginx`
+- request or reuse a certificate for `newvaccine.cpdinclinic.co.in`
+- update Nginx to redirect HTTP to HTTPS
+- enable the `certbot.timer` renewal job when available

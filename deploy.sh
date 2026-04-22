@@ -10,6 +10,8 @@ APP_PORT="${APP_PORT:-8000}"
 NGINX_SITE="${NGINX_SITE:-vaccinesystem}"
 GUNICORN_SERVICE="${GUNICORN_SERVICE:-gunicorn-vaccine}"
 DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-vaccination_project.settings}"
+ENABLE_HTTPS="${ENABLE_HTTPS:-0}"
+LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-}"
 PYTHON_BIN="${VENV_DIR}/bin/python"
 PIP_BIN="${VENV_DIR}/bin/pip"
 
@@ -50,6 +52,8 @@ install_os_packages() {
     DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y \
       git \
       nginx \
+      certbot \
+      python3-certbot-nginx \
       python3 \
       python3-dev \
       python3-venv \
@@ -172,6 +176,7 @@ write_nginx_site() {
   $SUDO tee "/etc/nginx/sites-available/${NGINX_SITE}" >/dev/null <<EOF
 server {
     listen 80;
+    listen [::]:80;
     server_name ${APP_HOST};
 
     client_max_body_size 25M;
@@ -190,6 +195,7 @@ server {
 
     location / {
         proxy_pass http://127.0.0.1:${APP_PORT};
+        proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -276,6 +282,34 @@ restart_services() {
   fi
 }
 
+configure_https_if_requested() {
+  if [ "${ENABLE_HTTPS}" != "1" ]; then
+    log "HTTPS certificate setup disabled (set ENABLE_HTTPS=1 and LETSENCRYPT_EMAIL=you@example.com to enable)"
+    return
+  fi
+
+  [ -n "${LETSENCRYPT_EMAIL}" ] || fail "ENABLE_HTTPS=1 requires LETSENCRYPT_EMAIL to be set"
+
+  if ! command -v certbot >/dev/null 2>&1; then
+    fail "certbot is not installed; rerun on Ubuntu/Debian with apt-get available or install certbot manually"
+  fi
+
+  log "Requesting or refreshing Let's Encrypt certificate for ${APP_HOST}"
+  $SUDO systemctl start nginx
+  $SUDO certbot --nginx \
+    --non-interactive \
+    --agree-tos \
+    --redirect \
+    --keep-until-expiring \
+    -m "${LETSENCRYPT_EMAIL}" \
+    -d "${APP_HOST}"
+
+  if $SUDO systemctl list-unit-files | grep -q '^certbot.timer'; then
+    log "Ensuring certbot renewal timer is enabled"
+    $SUDO systemctl enable --now certbot.timer
+  fi
+}
+
 main() {
   log "Starting Vaccine System deployment"
   install_os_packages
@@ -289,6 +323,7 @@ main() {
   bootstrap_reference_data_if_needed
   run_checks_and_collectstatic
   restart_services
+  configure_https_if_requested
   log "Deployment completed successfully"
 }
 

@@ -72,6 +72,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://newvaccine.cpdinclinic.co.in",
     "https://newvaccine.cpdinclinic.co.in"
 ]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
