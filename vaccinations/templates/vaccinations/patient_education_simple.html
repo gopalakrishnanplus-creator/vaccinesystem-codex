@@ -19,6 +19,7 @@
         </div>
 
         {% youtube_embed v.video_url as embed_src %}
+        {% youtube_watch_url v.video_url as watch_url %}
         
         {% if embed_src %}
           <div id="player-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="video-embed">
@@ -28,6 +29,7 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
               loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
               title="YouTube video: {{ v.title|default:'Vaccine Education' }}"
               onerror="handleYouTubeError(this)"
               onload="handleYouTubeLoad(this)">
@@ -45,12 +47,18 @@
                class="video-fallback" style="display:none;">
             <p>
               <strong>Video playback issue detected</strong><br>
-              This video failed to load properly.
+              This video could not be played inside the current browser.
             </p>
             <div class="video-fallback__actions">
-              <a class="btn" href="{{ v.video_url }}" target="_blank" rel="noopener">Watch Directly on YouTube</a>
+              <a class="btn" href="{{ watch_url|default:v.video_url }}" target="_blank" rel="noopener">Watch Directly on YouTube</a>
               <button class="btn btn-success" type="button" onclick="retryVideo('{{ embed_src }}', '{{ forloop.parentloop.counter }}-{{ forloop.counter }}')">Retry Loading</button>
             </div>
+          </div>
+
+          <div class="edu-actions">
+            <a class="btn btn-secondary" href="{{ watch_url|default:v.video_url }}" target="_blank" rel="noopener">
+              Open in YouTube
+            </a>
           </div>
           
         {% else %}
@@ -59,7 +67,7 @@
               <strong>Invalid video URL</strong>
             </p>
             {% if v.video_url %}
-              <a class="btn btn-danger" href="{{ v.video_url }}" target="_blank" rel="noopener">
+              <a class="btn btn-danger" href="{{ watch_url|default:v.video_url }}" target="_blank" rel="noopener">
                  Open on YouTube
               </a>
             {% endif %}
@@ -77,43 +85,39 @@
 <script>
 // Global variables to track player states
 const playerStates = {};
+const playerTimers = {};
 
 function handleYouTubeLoad(iframe) {
-  console.log('YouTube iframe loaded:', iframe.id);
   const id = iframe.id.replace('yt-player-', '');
   const loadingElement = document.getElementById('loading-' + id);
   if (loadingElement) {
     loadingElement.style.display = 'none';
   }
-  
-  // Set timeout to check if video actually plays
-  playerStates[iframe.id] = 'loading';
-  setTimeout(() => {
-    if (playerStates[iframe.id] === 'loading') {
-      // If still loading after 5 seconds, show error
-      handleYouTubeError(iframe);
-    }
-  }, 5000);
+
+  playerStates[iframe.id] = 'ready';
+  if (playerTimers[iframe.id]) {
+    clearTimeout(playerTimers[iframe.id]);
+    delete playerTimers[iframe.id];
+  }
 }
 
 function handleYouTubeError(iframe) {
-  console.log('YouTube iframe error:', iframe.id);
   const id = iframe.id.replace('yt-player-', '');
-  
-  // Hide the iframe and loading spinner
-  iframe.style.display = 'none';
   const loadingElement = document.getElementById('loading-' + id);
   if (loadingElement) {
     loadingElement.style.display = 'none';
   }
-  
-  // Show fallback options
+
   const fallbackElement = document.getElementById('fallback-' + id);
   if (fallbackElement) {
     fallbackElement.style.display = 'block';
   }
-  
+
   playerStates[iframe.id] = 'error';
+  if (playerTimers[iframe.id]) {
+    clearTimeout(playerTimers[iframe.id]);
+    delete playerTimers[iframe.id];
+  }
 }
 
 function retryVideo(embedSrc, playerId) {
@@ -122,37 +126,33 @@ function retryVideo(embedSrc, playerId) {
   const loadingElement = document.getElementById('loading-' + playerId);
   
   if (iframe && fallbackElement && loadingElement) {
-    // Show loading, hide fallback
     fallbackElement.style.display = 'none';
     loadingElement.style.display = 'block';
-    iframe.style.display = 'block';
-    
-    // Add cache busting parameter to force reload
-    const cacheBuster = '&cache=' + new Date().getTime();
-    iframe.src = embedSrc + cacheBuster;
-    
+
+    const separator = embedSrc.includes('?') ? '&' : '?';
+    iframe.src = embedSrc + separator + 'cache=' + Date.now();
+
     playerStates[iframe.id] = 'retrying';
-    
-    // Set timeout for retry
-    setTimeout(() => {
+    if (playerTimers[iframe.id]) {
+      clearTimeout(playerTimers[iframe.id]);
+    }
+    playerTimers[iframe.id] = setTimeout(() => {
       if (playerStates[iframe.id] === 'retrying') {
         handleYouTubeError(iframe);
       }
-    }, 5000);
+    }, 12000);
   }
 }
 
-// Initialize all players when page loads
 document.addEventListener('DOMContentLoaded', function() {
-  // Hide all loading spinners after 8 seconds (safety net)
-  setTimeout(() => {
-    const loadingElements = document.querySelectorAll('[id^="loading-"]');
-    loadingElements.forEach(element => {
-      if (element.style.display !== 'none') {
-        element.style.display = 'none';
+  document.querySelectorAll('iframe[id^="yt-player-"]').forEach((iframe) => {
+    playerStates[iframe.id] = 'loading';
+    playerTimers[iframe.id] = setTimeout(() => {
+      if (playerStates[iframe.id] === 'loading') {
+        handleYouTubeError(iframe);
       }
-    });
-  }, 8000);
+    }, 12000);
+  });
 });
 </script>
 <div class="back-row">

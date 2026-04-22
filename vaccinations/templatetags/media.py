@@ -40,7 +40,7 @@ def _extract_youtube_id(url: str) -> str | None:
 @register.simple_tag(takes_context=True)
 def youtube_embed(context, url: str) -> str:
     """
-    Return YouTube embed URL - SIMPLIFIED to fix Error 153
+    Return a stable YouTube embed URL for inline playback.
     """
     try:
         if not url:
@@ -50,9 +50,13 @@ def youtube_embed(context, url: str) -> str:
         if not vid:
             return ""
         
-        # NO PARAMETERS - simplest approach to avoid Error 153
-        embed_url = f"https://www.youtube.com/embed/{vid}"
-        
+        params = urlencode({
+            "playsinline": 1,
+            "rel": 0,
+            "modestbranding": 1,
+        })
+        embed_url = f"https://www.youtube-nocookie.com/embed/{vid}?{params}"
+
         return embed_url
         
     except Exception as e:
@@ -65,3 +69,12 @@ def youtube_embed(context, url: str) -> str:
 def youtube_id(url: str) -> str:
     """Extract YouTube ID for debugging"""
     return _extract_youtube_id(url) or "INVALID"
+
+
+@register.simple_tag
+def youtube_watch_url(url: str) -> str:
+    """Return a normalized YouTube watch URL suitable for external open."""
+    vid = _extract_youtube_id(url)
+    if not vid:
+        return url or ""
+    return f"https://www.youtube.com/watch?v={vid}"
