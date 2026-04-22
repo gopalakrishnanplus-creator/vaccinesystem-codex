@@ -11,6 +11,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "local-dev-secret-key")
 DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000", "http://localhost:8000"]
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 PATIENT_DATA_FERNET_KEY = os.getenv("PATIENT_DATA_FERNET_KEY", "").encode()
 if not PATIENT_DATA_FERNET_KEY:
